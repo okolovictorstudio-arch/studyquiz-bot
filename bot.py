@@ -91,7 +91,9 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
     if user_id in user_quizzes:
         del user_quizzes[user_id]
-    await update.message.reply_text("Quiz cancelled. Send new notes whenever you're ready! 📚")
+    await update.message.reply_text(
+        "Quiz cancelled. Send new notes whenever you're ready! 📚"
+    )
 
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
@@ -185,9 +187,13 @@ async def send_question(update, context, user_id):
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     if update.message:
-        await update.message.reply_text(text, reply_markup=reply_markup, parse_mode="Markdown")
+        await update.message.reply_text(
+            text, reply_markup=reply_markup, parse_mode="Markdown"
+        )
     else:
-        await update.callback_query.message.reply_text(text, reply_markup=reply_markup, parse_mode="Markdown")
+        await update.callback_query.message.reply_text(
+            text, reply_markup=reply_markup, parse_mode="Markdown"
+        )
 
 async def handle_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -196,7 +202,9 @@ async def handle_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
 
     if user_id not in user_quizzes:
-        await query.message.reply_text("No active quiz. Send your notes to start!")
+        await query.message.reply_text(
+            "No active quiz. Send your notes to start!"
+        )
         return
 
     quiz = user_quizzes[user_id]
@@ -262,10 +270,10 @@ def main():
     app = (
         ApplicationBuilder()
         .token(TELEGRAM_TOKEN)
-        .connect_timeout(30)
-        .read_timeout(30)
-        .write_timeout(30)
-        .get_updates_read_timeout(30)
+        .connect_timeout(60)
+        .read_timeout(60)
+        .write_timeout(60)
+        .get_updates_read_timeout(60)
         .build()
     )
 
@@ -277,7 +285,7 @@ def main():
     app.add_handler(CallbackQueryHandler(handle_answer, pattern="^answer_"))
 
     print("🤖 StudyQuiz Bot is running...")
-    app.run_polling()
+    app.run_polling(drop_pending_updates=True)
 
 if __name__ == "__main__":
     main()
