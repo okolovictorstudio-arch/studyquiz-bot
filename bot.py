@@ -286,7 +286,7 @@ def main():
     if WEBHOOK_URL:
         app.run_webhook(
             listen="0.0.0.0",
-            port=int(os.environ.get("PORT", 8080)),
+            port=8080,
             webhook_url=f"{WEBHOOK_URL}/webhook",
             url_path="webhook",
             drop_pending_updates=True
