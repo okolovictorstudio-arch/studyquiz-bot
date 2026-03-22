@@ -16,6 +16,7 @@ from telegram.ext import (
 load_dotenv()
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 
 client = genai.Client(api_key=GEMINI_API_KEY)
 
@@ -270,10 +271,6 @@ def main():
     app = (
         ApplicationBuilder()
         .token(TELEGRAM_TOKEN)
-        .connect_timeout(60)
-        .read_timeout(60)
-        .write_timeout(60)
-        .get_updates_read_timeout(60)
         .build()
     )
 
@@ -285,7 +282,17 @@ def main():
     app.add_handler(CallbackQueryHandler(handle_answer, pattern="^answer_"))
 
     print("🤖 StudyQuiz Bot is running...")
-    app.run_polling(drop_pending_updates=True)
+
+    if WEBHOOK_URL:
+        app.run_webhook(
+            listen="0.0.0.0",
+            port=int(os.environ.get("PORT", 8080)),
+            webhook_url=f"{WEBHOOK_URL}/webhook",
+            url_path="webhook",
+            drop_pending_updates=True
+        )
+    else:
+        app.run_polling(drop_pending_updates=True)
 
 if __name__ == "__main__":
     main()
